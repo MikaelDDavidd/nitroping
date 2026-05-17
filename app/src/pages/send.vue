@@ -23,6 +23,7 @@ const appId = ref('')
 const channelType = ref('PUSH')
 const title = ref('')
 const body = ref('')
+const imageUrl = ref('')
 const toEmail = ref('')
 const contactTargetType = ref('all') // 'all' | 'specific'
 const selectedContactIds = ref<string[]>([])
@@ -87,6 +88,7 @@ async function sendNotification() {
       appId: appId.value,
       title: title.value,
       body: body.value,
+      imageUrl: imageUrl.value.trim() || undefined,
       scheduledAt: scheduleType.value === 'later' ? scheduledAt.value : undefined,
     }
 
@@ -101,6 +103,7 @@ async function sendNotification() {
     push.success({ title: 'Notification sent successfully' })
     title.value = ''
     body.value = ''
+    imageUrl.value = ''
     selectedContactIds.value = []
     scheduleType.value = 'now'
     scheduledAt.value = ''
@@ -189,6 +192,17 @@ async function sendNotification() {
             <div class="space-y-2">
               <Label>Body *</Label>
               <Textarea v-model="body" placeholder="Message content..." rows="4" />
+            </div>
+            <div v-if="channelType === 'PUSH'" class="space-y-2">
+              <Label>Image URL</Label>
+              <Input
+                v-model="imageUrl"
+                type="url"
+                placeholder="https://example.com/banner.png"
+              />
+              <p class="text-xs text-muted-foreground">
+                Optional. Shown as a big picture on Android and an attachment on iOS.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -310,13 +324,20 @@ async function sendNotification() {
                 <Icon :name="getChannelIcon()" class="size-3" />
                 <span>{{ channelType }}</span>
               </div>
-              <div class="bg-background rounded-lg p-3 shadow-sm">
-                <p class="font-semibold text-sm mb-1">
+              <div class="bg-background rounded-lg p-3 shadow-sm space-y-2">
+                <p class="font-semibold text-sm">
                   {{ title || 'Notification Title' }}
                 </p>
                 <p class="text-sm text-muted-foreground line-clamp-3">
                   {{ body || 'Message will appear here...' }}
                 </p>
+                <img
+                  v-if="channelType === 'PUSH' && imageUrl"
+                  :src="imageUrl"
+                  alt="Notification image preview"
+                  class="w-full rounded-md border max-h-40 object-cover"
+                  @error="(e) => ((e.target as HTMLImageElement).style.display = 'none')"
+                >
               </div>
             </div>
 
