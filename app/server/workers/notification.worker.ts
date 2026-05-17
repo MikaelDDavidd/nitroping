@@ -314,6 +314,9 @@ async function processDeviceDelivery(job: Job<SendNotificationJobData>) {
   try {
     const provider = await getProviderForApp(appId, platform)
 
+    // Note: rename imageUrl → image to match the provider's NotificationPayload
+    // shape (validation.ts). Without this, providers see `payload.image` as
+    // undefined and the image never reaches FCM/APNs/WebPush.
     const notificationPayload = {
       title: payload.title,
       body: payload.body,
@@ -321,7 +324,7 @@ async function processDeviceDelivery(job: Job<SendNotificationJobData>) {
       badge: payload.badge,
       sound: payload.sound,
       clickAction: payload.clickAction,
-      imageUrl: payload.imageUrl,
+      image: payload.imageUrl,
     }
 
     let message
