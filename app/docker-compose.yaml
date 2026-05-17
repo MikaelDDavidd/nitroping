@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:18
+    image: postgres:17
     container_name: postgres_db
     restart: always
     environment:
@@ -10,7 +10,7 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data_v17:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 5s
@@ -76,5 +76,5 @@ services:
       - .:/app
 
 volumes:
-  db_data:
+  db_data_v17:
   redis_data:
